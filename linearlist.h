@@ -73,11 +73,12 @@ class chain
 {
 private:
 	Node<T>* head=new Node<T>;
+	Node<T>* tail = new Node<T>;
 	int length = 0;
 public:
 	chain()
 	{
-		josephus();
+		magician();
 	}
 	void initRlist()
 	{
@@ -324,9 +325,7 @@ public:
 		}
 		return -1;
 	}
-	/// <summary>
-	/// 上面的代码由于一开始的理解有偏差，头节点和头指针指向的地方不一样，我把头指针的数据防空，没东西，下面开始就是一样的了
-	/// </summary>
+	//下面为了方便我把头指针当作头节点来用了
 	void josephus()
 	{
 		head->next = head;
@@ -357,9 +356,152 @@ public:
 			++times;
 			cout << "  " << times << endl;
 		}
+		cout << handle->data << " has suicided" << "  " << ++times << endl;
+
+	}
+	//带头节点和尾节点的循环链表
+	void InitRlist_tail()//尾插法
+	{
+		Node<T>* temp;
+		Node<T>* p=head;
+		head->next = tail;
+		cout << "enter the length pls " << endl;
+		cin >> length;
+		for (int i = 0;i < length; ++i)
+		{
+			cout << "enter the data pls " << endl;
+			temp = new Node<T>;
+			cin >> temp->data;
+			temp->next = p->next;//将尾指针指向新的尾部
+			p->next = temp;
+			p = temp;
+		}
+	}
+	void InitRlist_head()//头插法
+	{
+		Node<T>* temp;
+		head->next = tail;
+		cout << "enter the length pls " << endl;
+		cin >> length;
+		for (int i = 0; i < length; ++i)
+		{
+			cout << "enter the data pls " << endl;
+			temp = new Node<T>;
+			cin >> temp->data;
+			temp->next = head->next;
+			head->next = temp;
+		}
+	}//头插法使得尾指针不用重新指向
+	void magician()
+	{
+		Node<T>* temp;
+		Node<T>* p = head;
+		length = 13;
+		for (int i = 0; i < length; ++i)
+		{
+			temp = new Node<T>;
+			temp->data = 0;
+			p->next = temp;
+			p = temp;
+		}
+		p->next = head->next;
+		//生成一个十三个数的循环链表
+		head->next->data = 1;
+		Node<T>* tempPoint = head->next;
+		int count = 2;
+		while (1)
+		{
+			for (int i = 0; i < count; ++i)
+			{
+				tempPoint = tempPoint->next;
+				if (tempPoint->data != 0)
+				{
+					tempPoint = tempPoint->next;
+					--i;
+				}
+			}
+			tempPoint->data = count;
+			count+=1;
+			if (count == 14)
+			{
+				break;
+			}
+		}
+		Node<T>* tempNode = head->next;
+		for (int i = 0; i < length; ++i)
+		{
+			cout << "the " << i + 1 << " card is " << tempNode->data << endl;
+			tempNode = tempNode->next;
+		}
 
 	}
 
+
+
+};
+//接下来是双向链表
+template<typename T>
+struct double_node
+{
+	T data;
+	double_node* prior;
+	double_node* next;
+};
+template<typename T>
+class dualList
+{
+private:
+	double_node<T>* head;
+	int length;
+public:
+	dualList()
+	{
+		initList();
+	}
+	void initList()
+	{
+		head = new double_node<T>;
+		double_node<T>* temp;
+		double_node<T>* p = head;//尾插，头插不写了，差不多
+		cout << "enter the length pls" << endl;
+		cin >> length;
+		for (int i = 0; i < length; ++i)
+		{
+			temp = new double_node<T>;
+			p->next = temp;
+			temp->prior = p;
+			p = temp;
+		}
+		p->next = NULL;//不循环，循环指向头就好了
+
+	}
+	void insertList(int index)
+	{
+		double_node<T>* temp = new double_node<T>;
+		double_node<T>* pointer = head->next;
+		cout << "enter the data" << endl;
+		cin >> temp->data;
+		for (int i = 0; i < index; ++i)
+		{
+			pointer = pointer->next;
+		}
+		pointer->prior->next = temp;
+		temp->next = pointer;
+		temp->prior = pointer->prior;
+		pointer->prior = temp;
+	}
+	void deletelist(int index,double_node<T>* temp)
+	{
+		double_node<T>* pointer = head->next;
+		for (int i = 0; i < index; ++i)
+		{
+			pointer = pointer->next;
+		}
+		pointer->prior->next = pointer->next;
+		pointer->next->prior = pointer->prior;
+		temp->data = pointer->data;
+		delete pointer;
+	}
 
 };
 
